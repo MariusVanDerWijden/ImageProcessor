@@ -1,5 +1,7 @@
 package preprocessor;
 
+import art.Kubism;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -42,7 +44,7 @@ public class Main {
         BufferedImage img = ProcessorIO.loadImage(ordner+filename+ending);
         int [][] tempArr = ProcessorIO.bufferedImageToIntArray(img);
         tempArr = PreProcessor.hullSpace(tempArr,new Color(60,60,60).getRGB());
-        tempArr = PreProcessor.imageToKubismV2(tempArr,40);
+        tempArr = Kubism.imageToKubismV2(tempArr,40);
         BufferedImage image = ProcessorIO.intArrayToBufferedImage(tempArr,img.getWidth(),img.getHeight());
         ProcessorIO.writeImageToFile(image,ordner+"out/k"+filename,"jpg");
     }
