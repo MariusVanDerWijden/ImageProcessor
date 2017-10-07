@@ -1,11 +1,11 @@
-package preprocessor;
+package statics;
 
 import java.awt.*;
 import java.math.BigInteger;
 /**
  * Provides operations to transform whole images
  */
-public abstract class PreProcessor {
+public abstract class StaticTransformations {
 
 
     static int colorBlack = new Color(0,0,0).getRGB();

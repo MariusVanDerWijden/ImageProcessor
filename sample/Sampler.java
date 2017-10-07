@@ -1,6 +1,6 @@
-package mesher;
+package sample;
 
-import preprocessor.ProcessorIO;
+import io.ProcessorIO;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * Created by matematik on 7/9/16.
  */
-public class Mesher {
+public class Sampler {
 
     static int colorBlack = new Color(0,0,0).getRGB();
     static int colorWhite = new Color(255,255,255).getRGB();
