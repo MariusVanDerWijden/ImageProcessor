@@ -8,6 +8,42 @@ public class ImageBlending {
         return null;
     }
 
+    private static ResolutionPyramid laplacianPyramid(int[][] img, float a){
+        ResolutionPyramid res = new ResolutionPyramid();
+        ResolutionPyramid gauss = gaussianPyramid(img,a);
+        for(int[][] x: gauss.levels){
+            res.levels.add(expand(x,a));
+        }
+        res.levels.add(gauss.levels.get(gauss.levels.size()-1));
+        return res;
+    }
+
+    private static ResolutionPyramid gaussianPyramid(int[][] img, float a){
+        ResolutionPyramid res = new ResolutionPyramid();
+        res.levels.add(img);
+        int[][] tmp = img;
+        do{
+            tmp = reduce(tmp,a);
+            res.levels.add(tmp);
+        }while (tmp.length > 1 && tmp[0].length > 1);
+        return res;
+    }
+
+    private static int[][] expand(int[][] img, float a){
+        int[][] newLevel = new int[img.length*2][img[0].length*2];
+        float[][] weights = initializeWeights(a);
+        for(int i = 0; i < img.length; i++){
+            for(int j = 0; j < img[0].length; j++){
+                for(int u = -2; u < 2; u++){
+                    for(int v = -2; v < 2; v++){
+                        newLevel[i+u][j+v] += weights[2+u][2+v] * img[i][j];
+                    }
+                }
+            }
+        }
+        return newLevel;
+    }
+
     private static int[][] reduce(int[][] img, float a){
         int[][] newLevel = new int[img.length/2][img[0].length/2];
         float[][] weights = initializeWeights(a);
@@ -19,7 +55,7 @@ public class ImageBlending {
                     float sum = 0.f;
                     for(int u = -2; u < 2; u++)
                         for(int v  = -2; v < 2; v++)
-                            sum += weights[u][v] * img[i+u][j+v];
+                            sum += weights[2+u][2+v] * img[i+u][j+v];
                     newLevel[i][j] = (int)sum;
                 }
             }
@@ -47,7 +83,7 @@ public class ImageBlending {
         return reduce(img, 2/5);
     }
 
-    private class LaplacePyramid{
-        ArrayList<int[][]> levels;
+    private static class ResolutionPyramid{
+        ArrayList<int[][]> levels = new ArrayList<>();
     }
 }
