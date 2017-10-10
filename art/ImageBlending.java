@@ -12,9 +12,21 @@ public class ImageBlending {
         ResolutionPyramid res = new ResolutionPyramid();
         ResolutionPyramid gauss = gaussianPyramid(img,a);
         for(int[][] x: gauss.levels){
-            res.levels.add(expand(x,a));
+            int[][] tmp = expand(x,a);
+            res.levels.add(subtract(x,tmp));
         }
         res.levels.add(gauss.levels.get(gauss.levels.size()-1));
+            //last level of laplace pyramid is last of Gauss pyramid
+        return res;
+    }
+
+    private static int[][] subtract(int img1[][], int img2[][]){
+        int[][] res = img1;
+        for(int i = 0; i < img1.length; i++){
+            for(int j = 0; j < img1[0].length; j++){
+                res[i][j] -= img2[i][j];
+            }
+        }
         return res;
     }
 
