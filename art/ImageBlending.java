@@ -4,10 +4,38 @@ import java.util.ArrayList;
 
 public class ImageBlending {
 
-    public static int[][] blendLaplace(int[][] img1, int[][] img2){
-        return null;
+    /**
+     * blends two images together, uses stencil as an indicator, where the blending should be
+     * img1.length should be equal to img2.length
+     * @param img1
+     * @param img2
+     * @param stencil indicates how many percent of img1 should be visible (between 0 and 1)
+     * @param a parameter for gaussian pyramid
+     * @return
+     */
+    public static int[][] blendLaplace(int[][] img1, int[][] img2, float[][] stencil, float a){
+        ResolutionPyramid left = laplacianPyramid(img1,a);
+        ResolutionPyramid right = laplacianPyramid(img2,a);
+        int[][] result = new int[img1.length][img1[0].length];
+        for(int i = left.levels.size(); i > 0 ;i--){
+            int[][] tmpLeft = left.levels.get(i);
+            int[][] tmpRight = right.levels.get(i);
+            for(int x = 0; x < tmpLeft.length; x++){
+                for(int y = 0; y < tmpRight.length; y++){
+                    int tmp = (int) (stencil[x][y] * tmpLeft[x][y] + 1-stencil[x][y] * tmpRight[x][y]);
+                    result[x][y] += tmp;
+                }
+            }
+        }
+        return result;
     }
 
+    /**
+     * Returns a laplace pyramid (every level is bandpass)
+     * @param img
+     * @param a
+     * @return
+     */
     private static ResolutionPyramid laplacianPyramid(int[][] img, float a){
         ResolutionPyramid res = new ResolutionPyramid();
         ResolutionPyramid gauss = gaussianPyramid(img,a);
@@ -20,6 +48,12 @@ public class ImageBlending {
         return res;
     }
 
+    /**
+     * Subtracts every pixel from img2 off img1
+     * @param img1
+     * @param img2
+     * @return
+     */
     private static int[][] subtract(int img1[][], int img2[][]){
         int[][] res = img1;
         for(int i = 0; i < img1.length; i++){
@@ -30,6 +64,12 @@ public class ImageBlending {
         return res;
     }
 
+    /**
+     * Generates a gaussian Pyramid (every level is low-pass)
+     * @param img
+     * @param a
+     * @return
+     */
     private static ResolutionPyramid gaussianPyramid(int[][] img, float a){
         ResolutionPyramid res = new ResolutionPyramid();
         res.levels.add(img);
@@ -41,6 +81,12 @@ public class ImageBlending {
         return res;
     }
 
+    /**
+     * Expand operation, interpolates picture on bigger surface
+     * @param img
+     * @param a
+     * @return
+     */
     private static int[][] expand(int[][] img, float a){
         int[][] newLevel = new int[img.length*2][img[0].length*2];
         float[][] weights = initializeWeights(a);
@@ -56,6 +102,12 @@ public class ImageBlending {
         return newLevel;
     }
 
+    /**
+     * Reduce operation, reduces the given image to 1/4
+     * @param img
+     * @param a
+     * @return
+     */
     private static int[][] reduce(int[][] img, float a){
         int[][] newLevel = new int[img.length/2][img[0].length/2];
         float[][] weights = initializeWeights(a);
@@ -75,6 +127,11 @@ public class ImageBlending {
         return null;
     }
 
+    /**
+     * initializes the weights for the reduce/expand operations
+     * @param a
+     * @return
+     */
     private static float[][] initializeWeights(float a){
         float[][] weights = new float[5][5];
         float b = 1/4;
